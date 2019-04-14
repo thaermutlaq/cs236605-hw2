@@ -172,6 +172,49 @@ class ReLU(Block):
         return 'ReLU'
 
 
+class Sigmoid(Block):
+    """
+    Sigmoid activation function.
+    """
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, x, **kw):
+        """
+        Computes s(x) = 1/(1+exp(-x))
+        :param x: Input tensor of shape (N,*) where N is the batch
+        dimension, and * is any number of other dimensions.
+        :return: Sigmoid of each sample in x.
+        """
+
+        # TODO: Implement the Sigmoid function. Save whatever you need into
+        # grad_cache.
+        # ====== YOUR CODE: ======
+        raise NotImplementedError()
+        # ========================
+
+        return out
+
+    def backward(self, dout):
+        """
+        :param dout: Gradient with respect to block output, shape (N, *).
+        :return: Gradient with respect to block input, shape (N, *)
+        """
+
+        # TODO: Implement gradient w.r.t. the input x
+        # ====== YOUR CODE: ======
+        raise NotImplementedError()
+        # ========================
+
+        return dx
+
+    def params(self):
+        return []
+
+    def __repr__(self):
+        return 'Sigmoid'
+
+
 class CrossEntropyLoss(Block):
     def __init__(self):
         super().__init__()
@@ -234,6 +277,10 @@ class CrossEntropyLoss(Block):
 
 class Dropout(Block):
     def __init__(self, p=0.5):
+        """
+        Initializes a Dropout block.
+        :param p: Probability to drop an activation.
+        """
         super().__init__()
         assert 0. <= p <= 1.
         self.p = p

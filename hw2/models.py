@@ -2,36 +2,33 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .blocks import Block, Linear, ReLU, Dropout, Sequential
+from .blocks import Block, Linear, ReLU, Sigmoid, Dropout, Sequential
 
 
 class MLP(Block):
     """
     A simple multilayer perceptron model based on our custom Blocks.
-    Architecture is:
+    Architecture is (with ReLU activation):
 
         FC(in, h1) -> ReLU -> FC(h1,h2) -> ReLU -> ... -> FC(hn, num_classes)
 
     Where FC is a fully-connected layer and h1,...,hn are the hidden layer
     dimensions.
-
-    If dropout is used, a dropout layer is added after every ReLU.
+    If dropout is used, a dropout layer is added after every activation
+    function.
     """
     def __init__(self, in_features, num_classes, hidden_features=(),
-                 dropout=0, **kw):
+                 activation='relu', dropout=0, **kw):
         super().__init__()
         """
         Create an MLP model Block.
         :param in_features: Number of features of the input of the first layer.
         :param num_classes: Number of features of the output of the last layer.
         :param hidden_features: A sequence of hidden layer dimensions.
+        :param activation: Either 'relu' or 'sigmoid', specifying which 
+        activation function to use between linear layers.
         :param: Dropout probability. Zero means no dropout.
         """
-        self.in_features = in_features
-        self.num_classes = num_classes
-        self.hidden_features = hidden_features
-        self.dropout = dropout
-
         blocks = []
 
         # TODO: Build the MLP architecture as described.

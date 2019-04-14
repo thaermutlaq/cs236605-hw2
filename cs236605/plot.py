@@ -35,6 +35,10 @@ def tensors_as_images(tensors, nrows=1, figsize=(8, 8), titles=[],
         image = image.transpose(1, 2, 0)
         image = image.squeeze()  # remove singleton dimensions if any exist
 
+        # Scale to range 0..1
+        min, max = np.min(image), np.max(image)
+        image = (image-min) / (max-min)
+
         ax.imshow(image, cmap=cmap)
 
         if len(titles) > i and titles[i] is not None:
@@ -47,13 +51,21 @@ def tensors_as_images(tensors, nrows=1, figsize=(8, 8), titles=[],
     return fig, axes
 
 
-def dataset_first_n(dataset, n, show_classes=False, class_labels=None, **kw):
+def dataset_first_n(dataset, n, show_classes=False, class_labels=None,
+                    random_start=True, **kw):
     """
     Plots first n images of a dataset containing tensor images.
     """
 
+    if random_start:
+        start = np.random.randint(0, len(dataset) - n)
+        stop = start + n
+    else:
+        start = 0
+        stop = n
+
     # [(img0, cls0), ..., # (imgN, clsN)]
-    first_n = list(itertools.islice(dataset, n))
+    first_n = list(itertools.islice(dataset, start, stop))
 
     # Split (image, class) tuples
     first_n_images, first_n_classes = zip(*first_n)

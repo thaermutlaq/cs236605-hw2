@@ -138,6 +138,10 @@ def copytree_ignore_fn(src, names, is_distribution=True):
     if is_distribution and os.path.basename(src) == 'results':
         return names
 
+    # Completely drop checkpoints folders
+    if os.path.basename(src) == 'checkpoints':
+        return names
+
     # Go over names and select the ones to drop
     return [name for name in names if ignore_predicate(name)]
 
