@@ -74,13 +74,13 @@ class Trainer(abc.ABC):
             # ====== YOUR CODE: ======
             train_res = self.train_epoch(dl_train, **kw)
             train_loss_value = sum(train_res.losses)/len(train_res.losses)
-            train_acc_value = train_res.accuracy.item()
+            train_acc_value = train_res.accuracy
             train_loss.append(train_loss_value)
             train_acc.append(train_acc_value)
 
             test_res = self.test_epoch(dl_test, **kw)
             test_loss_value = sum(test_res.losses)/len(test_res.losses)
-            test_acc_value = test_res.accuracy.item()
+            test_acc_value = test_res.accuracy
             test_loss.append(test_loss_value)
             test_acc.append(test_acc_value)
 
@@ -265,26 +265,27 @@ class TorchTrainer(Trainer):
         # - Optimize params
         # - Calculate number of correct predictions
         # ====== YOUR CODE: ======
-           # Forward pass
-        y_pred = self.model(X)
+        # Forward pass
+        y_prop = self.model(X)
 
         # Compute loss.
-        loss = self.loss_fn(y_pred, y)
+        loss = self.loss_fn(y_prop, y)
 
         self.optimizer.zero_grad()
 
         # Backward pass: compute gradient of the loss with respect to model
         # parameters
-        self.loss_fn.backward()
+        loss.backward()
 
         # Calling the step function on an Optimizer makes an update to its
         # parameters
         self.optimizer.step()
 
+        y_pred = y_prop.argmax(dim=1)
         num_correct = y_pred.eq(y).sum()
         # ========================
 
-        return BatchResult(loss, num_correct)
+        return BatchResult(loss.item(), num_correct.item())
 
     def test_batch(self, batch) -> BatchResult:
         X, y = batch
@@ -297,9 +298,10 @@ class TorchTrainer(Trainer):
             # - Forward pass
             # - Calculate number of correct predictions
             # ====== YOUR CODE: ======
-            y_predict = self.model(X)
-            loss = self.loss_fn(y_predict, y).item()
-            num_correct = y_predict.eq(y).sum()
+            y_prop = self.model(X)
+            y_pred = y_prop.argmax(dim=1)
+            loss = self.loss_fn(y_prop, y).item()
+            num_correct = y_pred.eq(y).sum().item()
             # ========================
 
         return BatchResult(loss, num_correct)

@@ -106,7 +106,7 @@ class ConvClassifier(nn.Module):
         # ====== YOUR CODE: ======
         prev_output_size = in_channels
         for i, num_filters in enumerate(self.filters):
-            layers.append(nn.Conv2d(in_channels = prev_output_size, out_channels = num_filters, kernel_size = 3))
+            layers.append(nn.Conv2d(in_channels = prev_output_size, out_channels = num_filters, kernel_size = 3, padding = 1))
             prev_output_size = num_filters
             layers.append(nn.ReLU())
             if (i + 1) % self.pool_every == 0:
@@ -118,14 +118,14 @@ class ConvClassifier(nn.Module):
 
     def _make_classifier(self):
         in_channels, in_h, in_w, = tuple(self.in_size)
-        print("in_channels {} in_h {} in_w {}".format(in_channels, in_h, in_w))
         layers = []
         # TODO: Create the classifier part of the model:
         # (Linear -> ReLU)*M -> Linear
         # You'll need to calculate the number of features first.
         # The last Linear layer should have an output dimension of out_classes.
         # ====== YOUR CODE: ======
-        prev_layer_out = 15488
+        num_dimension_reduce = len(self.filters) / self.pool_every
+        prev_layer_out = int(self.filters[-1] * (in_h / (2 ** num_dimension_reduce)) * (in_w / (2 ** num_dimension_reduce)))
         for hidden_dim in self.hidden_dims:
             layers.append(nn.Linear(in_features = prev_layer_out, out_features = hidden_dim))
             prev_layer_out = hidden_dim
@@ -157,6 +157,6 @@ class YourCodeNet(ConvClassifier):
     # For example, add batchnorm, dropout, skip connections, change conv
     # filter sizes etc.
     # ====== YOUR CODE: ======
-    #raise NotImplementedError()
+    # raise NotImplementedError()
     # ========================
 
