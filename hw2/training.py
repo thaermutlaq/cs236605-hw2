@@ -72,7 +72,29 @@ class Trainer(abc.ABC):
             # - Optional: Implement early stopping. This is a very useful and
             #   simple regularization technique that is highly recommended.
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            train_res = self.train_epoch(dl_train, **kw)
+            train_loss_value = sum(train_res.losses)/len(train_res.losses)
+            train_acc_value = train_res.accuracy.item()
+            train_loss.append(train_loss_value)
+            train_acc.append(train_acc_value)
+
+            test_res = self.test_epoch(dl_test, **kw)
+            test_loss_value = sum(test_res.losses)/len(test_res.losses)
+            test_acc_value = test_res.accuracy.item()
+            test_loss.append(test_loss_value)
+            test_acc.append(test_acc_value)
+
+            if best_acc is None or test_acc_value > best_acc:
+                best_acc = test_acc_value
+                epochs_without_improvement = 0
+                if checkpoints is not None:
+                    torch.save(self.model, checkpoints)
+            else:
+                epochs_without_improvement += 1
+                actual_num_epochs = epoch
+                if epochs_without_improvement == early_stopping:
+                    break
+
             # ========================
 
         return FitResult(actual_num_epochs,
@@ -188,7 +210,25 @@ class BlocksTrainer(Trainer):
         # - Optimize params
         # - Calculate number of correct predictions
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        # Forward pass
+        #X= X.reshape(X.shape[0], -1)
+        y_prop = self.model(X)
+        y_predict = y_prop.argmax(dim=1)
+
+        # Compute loss
+        loss = self.loss_fn(y_prop, y).item()
+
+        # zero grad
+        self.optimizer.zero_grad()
+
+        # backward
+        self.model.backward(self.loss_fn.backward())
+
+        # update params
+        self.optimizer.step()
+
+        # calculate num of correct predictions
+        num_correct = y_predict.eq(y).sum()
         # ========================
 
         return BatchResult(loss, num_correct)
@@ -200,7 +240,10 @@ class BlocksTrainer(Trainer):
         # - Forward pass
         # - Calculate number of correct predictions
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        y_prop = self.model(X)
+        y_predict = y_prop.argmax(dim=1)
+        loss = self.loss_fn(y_prop, y).item()
+        num_correct = y_predict.eq(y).sum()
         # ========================
 
         return BatchResult(loss, num_correct)
@@ -222,7 +265,23 @@ class TorchTrainer(Trainer):
         # - Optimize params
         # - Calculate number of correct predictions
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+           # Forward pass
+        y_pred = self.model(X)
+
+        # Compute loss.
+        loss = self.loss_fn(y_pred, y)
+
+        self.optimizer.zero_grad()
+
+        # Backward pass: compute gradient of the loss with respect to model
+        # parameters
+        self.loss_fn.backward()
+
+        # Calling the step function on an Optimizer makes an update to its
+        # parameters
+        self.optimizer.step()
+
+        num_correct = y_pred.eq(y).sum()
         # ========================
 
         return BatchResult(loss, num_correct)
@@ -238,7 +297,9 @@ class TorchTrainer(Trainer):
             # - Forward pass
             # - Calculate number of correct predictions
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            y_predict = self.model(X)
+            loss = self.loss_fn(y_predict, y).item()
+            num_correct = y_predict.eq(y).sum()
             # ========================
 
         return BatchResult(loss, num_correct)

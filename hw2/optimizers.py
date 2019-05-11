@@ -71,7 +71,8 @@ class VanillaSGD(Optimizer):
             # Update the gradient according to regularization and then
             # update the parameters tensor.
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            dp += self.reg * p
+            p  -= self.learn_rate * dp
             # ========================
 
 
@@ -90,11 +91,13 @@ class MomentumSGD(Optimizer):
 
         # TODO: Add your own initializations as needed.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        self.prev_velocity = []
+        for p, dp in self.params:
+            self.prev_velocity.append(torch.zeros_like(dp))
         # ========================
 
     def step(self):
-        for p, dp in self.params:
+        for i, (p, dp) in enumerate(self.params):
             if dp is None:
                 continue
 
@@ -102,7 +105,10 @@ class MomentumSGD(Optimizer):
             # update the parameters tensor based on the velocity. Don't forget
             # to include the regularization term.
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            dp += self.reg * p
+            cur_velocity = self.momentum * self.prev_velocity[i] - self.learn_rate * dp
+            p += cur_velocity
+            self.prev_velocity[i] = cur_velocity
             # ========================
 
 
@@ -123,11 +129,13 @@ class RMSProp(Optimizer):
 
         # TODO: Add your own initializations as needed.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        self.prev_r = []
+        for p, dp in self.params:
+            self.prev_r.append(torch.zeros_like(dp))
         # ========================
 
     def step(self):
-        for p, dp in self.params:
+        for i, (p, dp) in enumerate(self.params):
             if dp is None:
                 continue
 
@@ -136,5 +144,8 @@ class RMSProp(Optimizer):
             # average of it's previous gradients. Use it to update the
             # parameters tensor.
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            dp += self.reg * p
+            cur_r = self.decay * self.prev_r[i] + (1 - self.decay) * (dp**2)
+            p -= (self.learn_rate/(torch.sqrt(cur_r + self.eps))) * dp
+            self.prev_r[i] = cur_r
             # ========================
