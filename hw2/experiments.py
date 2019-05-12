@@ -59,6 +59,7 @@ def run_experiment(run_name, out_dir='./results', seed=None,
     filters = [filter_value for filter_value in filters_per_layer for repeat in range(layers_per_block)]
     sample, sample_class = ds_train[0]
     model = model_cls(in_size = sample.shape, out_classes = 10,filters = filters ,pool_every = pool_every, hidden_dims = hidden_dims)
+    print(model)
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(params = model.parameters(), lr = lr, momentum = 0.8, weight_decay = reg)
     trainer = training.TorchTrainer(model = model, loss_fn = loss_fn, optimizer = optimizer, device=device)
