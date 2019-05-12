@@ -172,18 +172,19 @@ class YourCodeNet(ConvClassifier):
         # Use only dimension-preserving 3x3 convolutions. Apply 2x2 Max
         # Pooling to reduce dimensions.
         # ====== YOUR CODE: ======
-        print("HEEEREEEEEEEEE")
         prev_output_size = in_channels
         pool_id = 0
         for i, num_filters in enumerate(self.filters):
-            layers.append(nn.Conv2d(in_channels = prev_output_size, out_channels = num_filters, kernel_size = 3, padding = 1))
-            layers.append(nn.BatchNorm2d(num_filters))
-            prev_output_size = num_filters
-            layers.append(nn.ReLU())
-            if ((i + 1) % self.pool_every == 0):
+            if ((prev_output_size != num_filters) and (prev_output_size != in_channels)):
                 pool_id = pool_id + 1
                 layers.append(nn.MaxPool2d(kernel_size = 2))
-                layers.append(nn.Dropout(p = 1./pool_id))
+                layers.append(nn.Dropout(p = (pool_id + 1)/10.0))
+            layers.append(nn.Conv2d(in_channels = prev_output_size, out_channels = num_filters, kernel_size = 3, padding = 1))
+            layers.append(nn.BatchNorm2d(num_filters))
+            layers.append(nn.ReLU())
+            prev_output_size = num_filters
+        layers.append(nn.MaxPool2d(kernel_size = 2))
+        layers.append(nn.Dropout(p = (pool_id + 1)/10.0))
 
             # ========================
         seq = nn.Sequential(*layers)
@@ -198,10 +199,13 @@ class YourCodeNet(ConvClassifier):
         # The last Linear layer should have an output dimension of out_classes.
         # ====== YOUR CODE: ======
         num_dimension_reduce = 0
+        prev_output_size = in_channels
         for i, num_filters in enumerate(self.filters):
-            if ((i + 1) % self.pool_every == 0):
+            if (prev_output_size) != num_filters:
                 num_dimension_reduce = num_dimension_reduce + 1
+            prev_output_size = num_filters
 
+        print("num_dimension_reduce:", num_dimension_reduce)
         prev_layer_out = int(self.filters[-1] * (in_h / (2 ** num_dimension_reduce)) * (in_w / (2 ** num_dimension_reduce)))
         for hidden_dim in self.hidden_dims:
             layers.append(nn.Linear(in_features = prev_layer_out, out_features = hidden_dim))
