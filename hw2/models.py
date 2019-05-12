@@ -145,7 +145,7 @@ class ConvClassifier(nn.Module):
         # Extract features from the input, run the classifier on them and
         # return class scores.
         # ====== YOUR CODE: ======
-        features = self.feature_extractor(x)
+        features = self.feature_extractor(x.float())
         features = features.view(features.size(0), -1)
         out = self.classifier(features)
         # ========================
