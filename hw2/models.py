@@ -109,7 +109,7 @@ class ConvClassifier(nn.Module):
             layers.append(nn.Conv2d(in_channels = prev_output_size, out_channels = num_filters, kernel_size = 3, padding = 1))
             prev_output_size = num_filters
             layers.append(nn.ReLU())
-            if (i + 1) % self.pool_every == 0:
+            if ((i + 1) % self.pool_every == 0):
                 layers.append(nn.MaxPool2d(kernel_size = 2))
 
         # ========================
@@ -124,7 +124,12 @@ class ConvClassifier(nn.Module):
         # You'll need to calculate the number of features first.
         # The last Linear layer should have an output dimension of out_classes.
         # ====== YOUR CODE: ======
-        num_dimension_reduce = len(self.filters) / self.pool_every
+        num_dimension_reduce = 0
+        for i, num_filters in enumerate(self.filters):
+            if ((i + 1) % self.pool_every == 0):
+                num_dimension_reduce = num_dimension_reduce + 1
+
+        print("num_dimension_reduce:", num_dimension_reduce)
         prev_layer_out = int(self.filters[-1] * (in_h / (2 ** num_dimension_reduce)) * (in_w / (2 ** num_dimension_reduce)))
         for hidden_dim in self.hidden_dims:
             layers.append(nn.Linear(in_features = prev_layer_out, out_features = hidden_dim))
