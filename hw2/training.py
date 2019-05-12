@@ -72,27 +72,23 @@ class Trainer(abc.ABC):
             # - Optional: Implement early stopping. This is a very useful and
             #   simple regularization technique that is highly recommended.
             # ====== YOUR CODE: ======
-            train_res = self.train_epoch(dl_train, **kw)
-            train_loss_value = sum(train_res.losses)/len(train_res.losses)
-            train_acc_value = train_res.accuracy
-            train_loss.append(train_loss_value)
-            train_acc.append(train_acc_value)
-
-            test_res = self.test_epoch(dl_test, **kw)
-            test_loss_value = sum(test_res.losses)/len(test_res.losses)
-            test_acc_value = test_res.accuracy
-            test_loss.append(test_loss_value)
-            test_acc.append(test_acc_value)
-
-            if best_acc is None or test_acc_value > best_acc:
-                best_acc = test_acc_value
+            train_res = self.train_epoch(dl_train, **dict(kw, verbose=verbose))
+            train_loss.extend(train_res.losses)
+            train_acc.append(train_res.accuracy)
+            
+            test_res = self.test_epoch(dl_test, **dict(kw, verbose=verbose))
+            test_loss.extend(test_res.losses)
+            test_acc.append(test_res.accuracy)
+            
+            if best_acc is None or test_res.accuracy > best_acc:
+                best_acc = test_res.accuracy
                 epochs_without_improvement = 0
                 if checkpoints is not None:
                     torch.save(self.model, checkpoints)
             else:
                 epochs_without_improvement += 1
                 actual_num_epochs = epoch
-                if epochs_without_improvement == early_stopping:
+                if early_stopping is not None and epochs_without_improvement == early_stopping:
                     break
 
             # ========================
@@ -228,7 +224,7 @@ class BlocksTrainer(Trainer):
         self.optimizer.step()
 
         # calculate num of correct predictions
-        num_correct = y_predict.eq(y).sum()
+        num_correct = y_predict.eq(y).sum().item()
         # ========================
 
         return BatchResult(loss, num_correct)
@@ -243,7 +239,7 @@ class BlocksTrainer(Trainer):
         y_prop = self.model(X)
         y_predict = y_prop.argmax(dim=1)
         loss = self.loss_fn(y_prop, y).item()
-        num_correct = y_predict.eq(y).sum()
+        num_correct = y_predict.eq(y).sum().item()
         # ========================
 
         return BatchResult(loss, num_correct)

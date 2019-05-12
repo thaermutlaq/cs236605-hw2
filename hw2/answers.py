@@ -67,7 +67,7 @@ we cause the network to under-learn. In addition, with larger dropout the traini
 """
 
 part2_q2 = r"""
-Yes, increasing in both the accuracy and loss is possible because loss is a continuous value average while accuracy is a discrete 
+Yes, increasing in both the accuracy and loss is possible because loss is a continuous value while accuracy is a discrete 
 value (class) depending.
 
 The softmax and class prediction can select the correct class while the actual probability is going far from the max but still not crossing 
@@ -86,6 +86,10 @@ max size 1.
 # Part 3 answers
 
 part3_q1 = r"""
+Note : My implementation was first to append to the loss graphs the loss average per epoch, This failed to pass submission due to timeout
+therefore changed it to all values loss extenssion from epoch run, however, I didn't change the experiments because the graphs have the sane 
+data (with avg or nor) and due to time shortage (found it at the last moment).
+ 
 1. best test accuracy that we got is around 58% and around 79% for training set. 
 2. better and faster converge for K=64 compared to K=32
 3. Increasing the network depth (L) hurts both the accuracy and loss, and for some large values of L (starting from L =8)
