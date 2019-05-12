@@ -161,17 +161,10 @@ class YourCodeNet(ConvClassifier):
     # For example, add batchnorm, dropout, skip connections, change conv
     # filter sizes etc.
     # ====== YOUR CODE: ======
-    # raise NotImplementedError()
-    # ========================
     def _make_feature_extractor(self):
         in_channels, in_h, in_w, = tuple(self.in_size)
 
         layers = []
-        # TODO: Create the feature extractor part of the model:
-        # [(Conv -> ReLU)*P -> MaxPool]*(N/P)
-        # Use only dimension-preserving 3x3 convolutions. Apply 2x2 Max
-        # Pooling to reduce dimensions.
-        # ====== YOUR CODE: ======
         prev_output_size = in_channels
         pool_id = 0
         for i, num_filters in enumerate(self.filters):
@@ -186,18 +179,12 @@ class YourCodeNet(ConvClassifier):
         layers.append(nn.MaxPool2d(kernel_size = 2))
         layers.append(nn.Dropout(p = (pool_id + 1)/10.0))
 
-            # ========================
         seq = nn.Sequential(*layers)
         return seq
 
     def _make_classifier(self):
         in_channels, in_h, in_w, = tuple(self.in_size)
         layers = []
-        # TODO: Create the classifier part of the model:
-        # (Linear -> ReLU)*M -> Linear
-        # You'll need to calculate the number of features first.
-        # The last Linear layer should have an output dimension of out_classes.
-        # ====== YOUR CODE: ======
         num_dimension_reduce = 0
         prev_output_size = in_channels
         for i, num_filters in enumerate(self.filters):
@@ -205,7 +192,6 @@ class YourCodeNet(ConvClassifier):
                 num_dimension_reduce = num_dimension_reduce + 1
             prev_output_size = num_filters
 
-        print("num_dimension_reduce:", num_dimension_reduce)
         prev_layer_out = int(self.filters[-1] * (in_h / (2 ** num_dimension_reduce)) * (in_w / (2 ** num_dimension_reduce)))
         for hidden_dim in self.hidden_dims:
             layers.append(nn.Linear(in_features = prev_layer_out, out_features = hidden_dim))
@@ -213,8 +199,8 @@ class YourCodeNet(ConvClassifier):
             layers.append(nn.ReLU())
 
         layers.append(nn.Linear(in_features = prev_layer_out, out_features = self.out_classes))
-        # ========================
         seq = nn.Sequential(*layers)
         return seq
+    # ========================
 
 

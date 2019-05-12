@@ -15,7 +15,7 @@ from cs236605.train_results import FitResult
 from . import models
 from . import training
 
-DATA_DIR = os.path.join("~", '.pytorch-datasets')
+DATA_DIR = os.path.join(os.getenv('HOME'), '.pytorch-datasets')
 
 
 def run_experiment(run_name, out_dir='./results', seed=None,

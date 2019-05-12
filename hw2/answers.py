@@ -48,7 +48,6 @@ def part2_dropout_hp():
 
 
 part2_q1 = r"""
-**Your answer:**
 With a dropout, I expected that the accuracy on the training set will decrease and the accuracy on the test set will increase, compared
 to no dropout. This was my expectation because dropout is used to help prevent overfitting. In addition I expected that the
 train accuracy will decrease when the dropout value is increased,
@@ -95,8 +94,10 @@ part3_q1 = r"""
    I think that bigger L perform worse because the database has only 10 classes with 60,000 samples which mean that we don't
    need a lot of parameters for it. Therefore going deeper is not better.
 4.For L=8 and L=16 the network failed to train. This can be explained with the huge number of parameters that need to be 
-  trained causing the target function to be to complex for our optimizer to keep converge for every step. This can be solved by reducing
-  the number of parameters needed to be trained every epoch by using a dropout for example, or maybe increasing the batch size.
+  trained causing the target function to be to complex for our optimizer to keep converge for every step (Vanishing Gradient problem). 
+  
+  This can be solved by reducing the number of parameters needed to be trained every epoch by using a dropout for example, 
+  or by using Residual networks.
 """
 
 part3_q2 = r"""
@@ -114,7 +115,7 @@ Now, not just the L affects the depth of the network sense every layer now is in
 experiment that only for L=1 the network is trainable. However, different number of filters in 3 convolution layers converged
 with better accuracy and loss on both train set and test set compared to L=2 and K=256 for example. This mean that varying the number 
 of filters in the convolution layers help compared to fixed K. 
-This experiment achieved the best accuracy for both train and test set achieving around 86% accuracy for train set and 70%
+This experiment achieved the best accuracy for both train and test set achieving around 86% accuracy for train set and 68%
 accuracy for test set. 
  
  And again, like the previous experiments, bigger L hurts the network causing it being un-trainable.
@@ -122,15 +123,16 @@ accuracy for test set.
 
 
 part3_q4 = r"""
-**Your answer:**
+I have performed two major modifications to the original network:
+1. I added a dropout layer after each pooling layer with incremental dropout probability. This layer should help the module
+   converge when training because number of params is reduced in every step which should help the optimizer.
+   In addition, this layer should prevent overfitting.
+2. I added a batch normalization layer after each convolution apply. This layers should increase the stability of the network
+    by normalizing the output of their previous convolution layer, preventing internal covariate shift.
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
-
+The new network was able to converge and train for all the values of L, and gain better accuracy and loss for both the train set
+and test set compared to previous experiments. However, for L=3,4 we still get worse results due to the very large amount of parameters.
+This time, we got a better results for L=2 compared to L=1, achieving ~78-80% test accuracy and ~88-90% train accuracy. Improving test accuracy
+in 10%-12 compared to the best result we got in experiment 1.
 """
 # ==============
