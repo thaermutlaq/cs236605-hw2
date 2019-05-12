@@ -11,7 +11,7 @@ for l in [2, 4, 8]:
 		experiments.run_experiment(run_name = "exp1_2_L{l}_L{k}".format(k = k, l = l), out_dir='./results2', seed=None,
                    # Training params
                    bs_train=128, bs_test=None, batches=100, epochs=100,
-                   early_stopping=7, checkpoints=None, lr=0.001, reg=1e-3,
+                   early_stopping=7, checkpoints=None, lr=0.004, reg=1e-3,
                    # Model params
                    filters_per_layer=[k], layers_per_block=l, pool_every=l/2,
                    hidden_dims=[100], ycn=False)
