@@ -12,7 +12,7 @@ for l in [1, 2, 3 ,4]:
                    bs_train=128, bs_test=None, batches=100, epochs=100,
                    early_stopping=7, checkpoints=None, lr=0.001, reg=1e-3,
                    # Model params
-                   filters_per_layer=[64, 128, 256], layers_per_block=l, pool_every=3,
+                   filters_per_layer=[64, 128, 256], layers_per_block=l, pool_every=l,
                    hidden_dims=[100], ycn=False)
 
 
